@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyTitle>JSON Validator</AssemblyTitle>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <AssemblyName>validateJson</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>validateJson</PackageId>
+    <RuntimeIdentifiers>win7-x64;win7-x86;win10-x64;win10-x86;rhel.7.2-x64</RuntimeIdentifiers>
+    <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.3" />
+  </ItemGroup>
+
+</Project>
