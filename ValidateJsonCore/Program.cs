@@ -35,8 +35,7 @@ namespace validateJson
             JArray input = JArray.Parse(inputJson);
             JSchema schema = JSchema.Parse(inputSchema);
 
-            IList<string> errorMessages;
-            bool validJson = input.IsValid(schema, out errorMessages);
+	        bool validJson = input.IsValid(schema, out IList<string> errorMessages);
 
             Console.WriteLine("Json is {0}", (validJson ? "valid" : "not valid"));
             if (!validJson)
