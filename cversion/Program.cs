@@ -74,9 +74,9 @@ namespace cversion
 			Assembly asm = Assembly.GetExecutingAssembly();
 			if (asm != null)
 			{
-				Console.WriteLine();
-				Console.WriteLine(String.Format("{0}: Displays File Version Info", asm.FullName.Split(',')[0]));
-				Console.WriteLine(String.Format("(C) 1999-{0} Bill Loytty", DateTime.Now.Year));
+				
+				Console.WriteLine($"{asm.FullName.Split(',')[0]}: Displays File Version Info");
+				Console.WriteLine($"(C) 1999-{DateTime.Now.Year} Bill Loytty");
 			}
 		}
 		private static void PrintUsage()

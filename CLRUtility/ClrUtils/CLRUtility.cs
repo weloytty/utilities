@@ -1,14 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using mscoree;
+using NLog;
 
 namespace ClrUtils
 {
 	public static class CLRUtility
 	{
+
+
+		private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+
+		public static bool Is64BitProcess()
+		{
+			return (IntPtr.Size == 8);
+		}
+
+		public static bool Is64BitProcess(int processId)
+		{
+			if (processId == 0) { return false;}
+
+			//if (IntPtr.Size != 8){return false;}
+
+			bool returnValue = false;
+
+			IntPtr hProcess = IntPtr.Zero;
+			try
+			{
+				hProcess = NativeMethods.OpenProcess(NativeMethods.PROCESS_QUERY_INFORMATION, false, processId);
+				bool flag;
+				returnValue =  !(NativeMethods.IsWow64Process(hProcess, out flag) && flag);
+
+			}
+			catch (Exception exp)
+			{
+				_logger.Error(exp);
+			}
+			finally
+			{
+				if (hProcess != IntPtr.Zero)
+				{
+					NativeMethods.CloseHandle(hProcess);
+				}
+			}
+
+			return returnValue;
+		}
+
+
+		static bool DoesWin32MethodExist(string moduleName, string methodName)
+		{
+			IntPtr moduleHandle = NativeMethods.GetModuleHandle(moduleName);
+			if (moduleHandle == IntPtr.Zero)
+			{
+				return false;
+			}
+			return (NativeMethods.GetProcAddress(moduleHandle, methodName) != IntPtr.Zero);
+		}
+
 		public static IEnumerable<_AppDomain> EnumAppDomains()
 		{
 			// Obtain ICLRMetaHost interface
