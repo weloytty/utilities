@@ -22,8 +22,15 @@ namespace ConsoleUtilities
             Console.ResetColor();
         }
 
+	    public static void WriteBoldLine(string outputString)
+	    {
+		    Console.BackgroundColor = ConsoleColor.White;
+		    Console.WriteLine(outputString, "");
+		    Console.ResetColor();
+	    }
 
-        public static void WriteBold(string outputFormat, string outputString)
+
+		public static void WriteBold(string outputFormat, string outputString)
         {
             Console.BackgroundColor = ConsoleColor.White;
             Console.Write(outputFormat, outputString);
