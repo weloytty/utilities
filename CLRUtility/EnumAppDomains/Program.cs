@@ -63,7 +63,7 @@ namespace EnumAppDomains
 									domain.Id, threadList.Count(), domain.Address);
 								Console.WriteLine(domainInfo);
 
-								Console.WriteLine($"Modules: {domain.Modules.Count.ToString("D3")} (including GAC? {opts.GAC}");
+								Console.WriteLine($"Modules: {domain.Modules.Count.ToString("D3")} (including GAC? {opts.GAC})");
 								foreach (ClrModule currMod in domain.Modules)
 								{
 									bool printMe = (!String.IsNullOrEmpty(currMod.AssemblyName)) && (!currMod.AssemblyName.Contains("\\GAC_") | opts.GAC);

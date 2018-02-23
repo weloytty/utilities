@@ -13,7 +13,7 @@ begin {
     $eadArgs = @()
     $eadCommand = ""
     if (Test-Path -Path ".\EnumAppDomains.exe" -PathType Leaf) {$eadCommand = $(Get-Item ".\EnumAppDomains.exe").FullName}
-    if ($eadCommand -ne "") {
+    if ($eadCommand -eq "") {
         $cmdInfo = $(Get-Command "EnumAppdomains")
         if (-not ($cmdInfo)) {throw "Can't find EnumAppDomains.exe"}
         $eadCommand = $cmdInfo.Source
