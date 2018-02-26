@@ -20,10 +20,10 @@ begin {
     }
 
     if ($ShowGac) {
-        $eadArgs += '-GAC'
+        $eadArgs += '-gac'
     }
     if ($ShowHeap) {
-        $eadArgs += '-HEAP'
+        $eadArgs += '-heap'
     }
 
 
@@ -41,7 +41,7 @@ process {
     }
     if ($ProcessId -ne 0) {
         foreach ($currId in $ProcessId) {
-            & "$eadCommand" --PID $currId $eadArgs
+            & "$eadCommand" --pid $currId $eadArgs
         }
         
     }
