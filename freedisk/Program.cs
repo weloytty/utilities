@@ -59,11 +59,13 @@ namespace freedisk
                             Program.BytesToFormattedGB(diskSize, 8), 
                             Program.BytesToFormattedGB(diskFree, 8));
                 }
+                Console.WriteLine("");
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Exception: " + ex.Message);
             }
+            
         }
 
         private static string BytesToFormattedGB(ulong bytes, int padding)
