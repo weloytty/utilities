@@ -32,7 +32,7 @@ __forceinline BOOL CheckFlagI(PCTSTR pszArg, TCHAR ch);
 __forceinline BOOL ReadEnvironmentVariable(PCTSTR pszName, PTSTR pszBuffer, DWORD cchBuffer);
 
 #pragma comment(linker, "/entry:elevate")
-void elevate()
+void main()
 {
 	LAUNCHMODE mode = MODE_NORMAL;
 	BOOL fWait = FALSE;

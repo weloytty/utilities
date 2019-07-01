@@ -40,8 +40,9 @@ namespace freedisk
                         return;
                 }
             }
-            try
-            {
+            try {
+                
+                PrintBanner();
                 ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(new ManagementScope("\\\\" + computerName + "\\root\\cimv2"), new SelectQuery(wmiQuery));
                 Console.WriteLine("");
                 if (noOutput)
@@ -81,10 +82,14 @@ namespace freedisk
             return new Regex("\\<;-'").Replace(inputString, " ");
         }
 
-        private static void ShowUsage()
-        {
+        private static void PrintBanner() {
             Console.WriteLine("");
             Console.WriteLine($"freedisk.exe (c) 2014-{DateTime.Now.Year} Bill Loytty");
+        }
+
+        private static void ShowUsage() {
+            
+            PrintBanner();
             Console.WriteLine("USAGE: freedisk.exe [-d driveletter] [-b] [-m computername] [-?]");
             Console.WriteLine("       -d = Drive to check (default is all)");
             Console.WriteLine("       -b = Do not display headings");
