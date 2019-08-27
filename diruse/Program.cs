@@ -17,7 +17,7 @@ namespace diruse
         {
 
             double spaceUsed;
-            string directoryToCheck = "";
+            var directoryToCheck = "";
             bool recursionFlag = false;
             bool verboseFlag = false;
             outputFormat outFormat = outputFormat.Bytes;
@@ -89,7 +89,7 @@ namespace diruse
 
         private static string GetFormattedNumber(double input, outputFormat outFormat)
         {
-            string returnString=String.Empty;
+            string returnString;
 
             switch(outFormat)
             {
@@ -137,7 +137,7 @@ namespace diruse
                         }
 
                     }
-                    catch (UnauthorizedAccessException ex)
+                    catch (UnauthorizedAccessException)
                     {
                         //swallow it and keep going!
                         if (verbose && !(rootDirectory)) ConsoleUtils.WriteTwoColumns("Can't access", directory);

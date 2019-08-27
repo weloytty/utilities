@@ -149,9 +149,8 @@ namespace IsDebug
 
                             returnValue = typedAttribute.IsJITOptimizerDisabled;
                         }
-                    PortableExecutableKinds peKind;
-                    ImageFileMachine imageFileMachine;
-                    ass.ManifestModule.GetPEKind(out peKind, out imageFileMachine);
+
+                    ass.ManifestModule.GetPEKind(out var peKind, out var imageFileMachine);
 
 
                     if (beVerbose)
