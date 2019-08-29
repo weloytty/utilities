@@ -3,9 +3,9 @@ using System.IO;
 
 namespace jpgUtility
 {
-    public class JpegPatcher
+    public static class ExifRemover
     {
-        public Stream PatchAwayExif(Stream inStream, Stream outStream)
+        public static Stream PatchAwayExif(Stream inStream, Stream outStream)
         {
             byte[] jpegHeader = new byte[2];
             jpegHeader[0] = (byte)inStream.ReadByte();
@@ -25,7 +25,7 @@ namespace jpgUtility
             return outStream;
         }
 
-        private void SkipAppHeaderSection(Stream inStream)
+        private static void SkipAppHeaderSection(Stream inStream)
         {
             byte[] header = new byte[2];
             header[0] = (byte)inStream.ReadByte();

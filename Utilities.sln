@@ -22,13 +22,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComPortControl", "ComPortControl\ComPortControl.csproj", "{D7D2710F-F299-41C2-85F6-58B864EB6FFB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Exif Utility", "Exif Utility", "{C1C46EF9-4C46-4F7C-9D68-182A0563C300}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeExif", "deexif\DeExif\DeExif.csproj", "{5F7AD356-0B5F-4290-9390-5D160EC1C9DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JpgUtility", "deexif\jpgUtility\JpgUtility.csproj", "{35077E63-F45B-4667-AEC4-DC297449F064}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JpgUtility", "deexif\jpgUtility\JpgUtility.csproj", "{35077E63-F45B-4667-AEC4-DC297449F064}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -124,18 +122,6 @@ Global
 		{9079D668-E8C4-4A10-8D51-18635EB56E77}.Release|x64.Build.0 = Release|Any CPU
 		{9079D668-E8C4-4A10-8D51-18635EB56E77}.Release|x86.ActiveCfg = Release|Any CPU
 		{9079D668-E8C4-4A10-8D51-18635EB56E77}.Release|x86.Build.0 = Release|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Debug|x64.Build.0 = Debug|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Debug|x86.Build.0 = Debug|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Release|x64.ActiveCfg = Release|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Release|x64.Build.0 = Release|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Release|x86.ActiveCfg = Release|Any CPU
-		{D7D2710F-F299-41C2-85F6-58B864EB6FFB}.Release|x86.Build.0 = Release|Any CPU
 		{5F7AD356-0B5F-4290-9390-5D160EC1C9DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F7AD356-0B5F-4290-9390-5D160EC1C9DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F7AD356-0B5F-4290-9390-5D160EC1C9DE}.Debug|x64.ActiveCfg = Debug|Any CPU
