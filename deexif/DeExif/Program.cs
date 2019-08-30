@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 using System.IO;
+using System.Linq.Expressions;
 using System.Net.Mime;
 using jpgUtility;
 using JpgUtility;
@@ -25,8 +26,12 @@ namespace DeExif {
 
         static int RunShowAndReturnExitCode(ShowOptions opts) {
             if (File.Exists(opts.FileName)) {
-                foreach (var s in GetProperties(opts.FileName)) {
-                    Console.WriteLine($"{s.Key.PadRight(25)}:{s.Value.PadLeft(55)}");
+                try {
+                    foreach (var s in GetProperties(opts.FileName)) {
+                        Console.WriteLine($"{s.Key.PadRight(25)}:{s.Value.PadLeft(55)}");
+                    }
+                } catch (Exception e) {
+                    Console.WriteLine($"Error procecssing {opts.FileName}:{e.Message}");
                 }
             }
 
@@ -34,20 +39,26 @@ namespace DeExif {
         }
 
         private static IEnumerable<KeyValuePair<string, string>> GetProperties(string inputFile) {
-            using (var reader = new ExifReader(inputFile)) {
-                foreach (var tagId in Enum.GetValues(typeof(ExifTags)).Cast<ushort>()) {
-                    if (reader.GetTagValue(tagId, out object val)) {
-                        if (val is double) {
-                            if (reader.GetTagValue(tagId, out int[] rational)) {
-                                val = $"{val} ({rational[0] / rational[1]})";
+
+          
+                using (var reader = new ExifReader(inputFile)) {
+                    foreach (var tagId in Enum.GetValues(typeof(ExifTags)).Cast<ushort>()) {
+                        if (reader.GetTagValue(tagId, out object val)) {
+                            if (val is double) {
+                                if (reader.GetTagValue(tagId, out int[] rational)) {
+                                    val = $"{val} ({rational[0] / rational[1]})";
+                                }
                             }
+
+                            yield return new KeyValuePair<string, string>($"{Enum.GetName(typeof(ExifTags), tagId)}",
+                                $"{RenderTag(val)}");
                         }
-                        yield return new KeyValuePair<string, string>($"{Enum.GetName(typeof(ExifTags), tagId)}", $"{RenderTag(val)}");
                     }
+
                 }
-            }
+          
         }
-       
+
         private static string RenderTag(object tagValue) {
             // Arrays don't render well without assistance.
             if (tagValue is Array array) {
@@ -85,16 +96,16 @@ namespace DeExif {
             string origDir = Path.GetDirectoryName(origFile);
             string newFile = $"NEW{Path.GetFileName(origFile)}";
             string newFullPath = Path.Combine(origDir, newFile);
-            
+
             try {
                 if (File.Exists(newFullPath)) { File.Delete(newFullPath); }
-                File.Move(tempFile,newFullPath );
+                File.Move(tempFile, newFullPath);
                 Console.WriteLine($"Cleaned {opts.FileName} to {newFullPath}");
             } catch (Exception e) {
                 Console.WriteLine($"Can't write {opts.FileName} to {newFullPath}, new file is {tempFile}");
             }
-            
-            
+
+
             return returnCode;
         }
     }
