@@ -482,7 +482,8 @@ namespace JpgUtility {
                 // (i.e. Microsoft.Phone.Tasks.DssPhotoStream), so we have to make sure the seek actually worked. The check is performed
                 // here because this is the first time we perform a seek operation.
                 if (_stream.Position != expectedPosition)
-                    throw new ExifLibException(string.Format("Supplied stream of type {0} reports CanSeek=true, but fails to seek", _stream.GetType()));
+                    throw new ExifLibException(
+                        $"Supplied stream of type {_stream.GetType()} reports CanSeek=true, but fails to seek");
             }
 
             // It's only success if we found the 0xFFE1 marker

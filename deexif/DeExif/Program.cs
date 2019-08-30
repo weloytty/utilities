@@ -14,7 +14,7 @@ namespace DeExif {
     class Program {
         static int Main(string[] args) {
 
-      
+
 
             return CommandLine.Parser.Default.ParseArguments<ShowOptions, RemoveOptions>(args)
                 .MapResult(
@@ -25,36 +25,29 @@ namespace DeExif {
 
         static int RunShowAndReturnExitCode(ShowOptions opts) {
             if (File.Exists(opts.FileName)) {
-                foreach (string s in GetProperties(opts.FileName)) {
-                    Console.WriteLine(s);
+                foreach (var s in GetProperties(opts.FileName)) {
+                    Console.WriteLine($"{s.Key.PadRight(25)}:{s.Value.PadLeft(55)}");
                 }
             }
 
             return 0;
         }
 
-        private static string[] GetProperties(string inputFile) {
+        private static IEnumerable<KeyValuePair<string, string>> GetProperties(string inputFile) {
             using (var reader = new ExifReader(inputFile)) {
-                var props = Enum.GetValues(typeof(ExifTags)).Cast<ushort>().Select(tagID => {
-                    if (reader.GetTagValue(tagID, out object val)) {
-                        // Special case - some doubles are encoded as TIFF rationals. These
-                        // items can be retrieved as 2 element arrays of {numerator, denominator}
+                foreach (var tagId in Enum.GetValues(typeof(ExifTags)).Cast<ushort>()) {
+                    if (reader.GetTagValue(tagId, out object val)) {
                         if (val is double) {
-                            if (reader.GetTagValue(tagID, out int[] rational))
-                                val = $"{val} ({rational[0]}/{rational[1]})";
-
-                            return $"{Enum.GetName(typeof(ExifTags), tagID)}: {RenderTag(val)}";
+                            if (reader.GetTagValue(tagId, out int[] rational)) {
+                                val = $"{val} ({rational[0] / rational[1]})";
+                            }
                         }
-
-                        return $"{Enum.GetName(typeof(ExifTags), tagID)}: {RenderTag(val)}";
+                        yield return new KeyValuePair<string, string>($"{Enum.GetName(typeof(ExifTags), tagId)}", $"{RenderTag(val)}");
                     }
-
-                    return null;
-
-                }).Where(x => x != null).ToArray();
-                return props;
+                }
             }
         }
+       
         private static string RenderTag(object tagValue) {
             // Arrays don't render well without assistance.
             if (tagValue is Array array) {
@@ -78,16 +71,30 @@ namespace DeExif {
             string origFile = Path.GetFullPath(opts.FileName);
             using (Stream inFs = File.Open(origFile, FileMode.Open, FileAccess.Read)) {
                 using (Stream outFs = File.Open(tempFile, FileMode.OpenOrCreate, FileAccess.Write)) {
-                    ExifRemover.PatchAwayExif(inFs, outFs);
-                    outFs.Close();
+                    try {
+                        ExifRemover.PatchAwayExif(inFs, outFs);
+                    } catch (ExifLibException xifLibEx) {
+                        Console.WriteLine($"Exception {xifLibEx.Message} trying to read '{opts.FileName}'");
+                    } finally {
+                        outFs.Close();
+                    }
                 }
                 inFs.Close();
             }
 
             string origDir = Path.GetDirectoryName(origFile);
             string newFile = $"NEW{Path.GetFileName(origFile)}";
-
-            File.Move(tempFile, Path.Combine(origDir,newFile));
+            string newFullPath = Path.Combine(origDir, newFile);
+            
+            try {
+                if (File.Exists(newFullPath)) { File.Delete(newFullPath); }
+                File.Move(tempFile,newFullPath );
+                Console.WriteLine($"Cleaned {opts.FileName} to {newFullPath}");
+            } catch (Exception e) {
+                Console.WriteLine($"Can't write {opts.FileName} to {newFullPath}, new file is {tempFile}");
+            }
+            
+            
             return returnCode;
         }
     }

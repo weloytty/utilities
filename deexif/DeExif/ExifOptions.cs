@@ -2,11 +2,9 @@
 using CommandLine;
 using CommandLine.Text;
 
-namespace DeExif
-{
+namespace DeExif {
 
-    interface IExifOptions
-    {
+    interface IExifOptions {
         [Option('q', "quiet",
             HelpText = "Suppresses summary messages.")]
         bool Quiet { get; set; }
@@ -18,16 +16,13 @@ namespace DeExif
     }
 
     [Verb("show", HelpText = "Displays a file's Exif information")]
-    public class ShowOptions : IExifOptions
-    {
+    public class ShowOptions : IExifOptions {
         public string FileName { get; set; }
         public bool Quiet { get; set; }
 
         [Usage(ApplicationAlias = "deexif")]
-        public static IEnumerable<Example> Examples
-        {
-            get
-            {
+        public static IEnumerable<Example> Examples {
+            get {
                 return new List<Example>() {
                     new Example("Filename to be processed", new ShowOptions {FileName = "file.jpg"})
                 };
@@ -35,20 +30,15 @@ namespace DeExif
         }
     }
 
-
-
     [Verb("remove", HelpText = "Removes Exif information from a file")]
-    class RemoveOptions
-    {
+    class RemoveOptions : IExifOptions {
 
         public string FileName { get; set; }
         public bool Quiet { get; set; }
 
         [Usage(ApplicationAlias = "deexif")]
-        public static IEnumerable<Example> Examples
-        {
-            get
-            {
+        public static IEnumerable<Example> Examples {
+            get {
                 return new List<Example>() {
                     new Example("Filename to be processed", new RemoveOptions {FileName = "file.jpg"})
                 };
