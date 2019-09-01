@@ -24,13 +24,9 @@ namespace QSend {
 
                     msg.Body = opts.MessageBody;
                     mq.Send(msg, opts.MessageLabel);
-
                 }
             }
-
             return 0;
         }
-
-
     }
 }
