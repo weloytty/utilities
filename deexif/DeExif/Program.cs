@@ -96,13 +96,15 @@ namespace DeExif {
             string origDir = Path.GetDirectoryName(origFile);
             string newFile = $"NEW{Path.GetFileName(origFile)}";
             string newFullPath = Path.Combine(origDir, newFile);
-
+            Console.WriteLine($"SOURCE: {opts.FileName}");
+            Console.WriteLine($"TEMP  : {tempFile}");
+            Console.WriteLine($"DEST  : {newFullPath}");
             try {
                 if (File.Exists(newFullPath)) { File.Delete(newFullPath); }
                 File.Move(tempFile, newFullPath);
-                Console.WriteLine($"Cleaned {opts.FileName} to {newFullPath}");
+                Console.WriteLine($"DONE.");
             } catch (Exception e) {
-                Console.WriteLine($"Can't write {opts.FileName} to {newFullPath}, new file is {tempFile}");
+                Console.WriteLine($"ERROR COPYING. Cleaned file: {tempFile}");
             }
 
 

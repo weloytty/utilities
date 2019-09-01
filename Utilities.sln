@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeExif", "deexif\DeExif\DeE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JpgUtility", "deexif\jpgUtility\JpgUtility.csproj", "{35077E63-F45B-4667-AEC4-DC297449F064}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSend", "qsend\QSend.csproj", "{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -146,6 +148,18 @@ Global
 		{35077E63-F45B-4667-AEC4-DC297449F064}.Release|x64.Build.0 = Release|Any CPU
 		{35077E63-F45B-4667-AEC4-DC297449F064}.Release|x86.ActiveCfg = Release|Any CPU
 		{35077E63-F45B-4667-AEC4-DC297449F064}.Release|x86.Build.0 = Release|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Debug|x64.Build.0 = Debug|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Debug|x86.Build.0 = Debug|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Release|x64.ActiveCfg = Release|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Release|x64.Build.0 = Release|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Release|x86.ActiveCfg = Release|Any CPU
+		{0933BB43-682F-4B26-99A8-8BD8AE7E3C04}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
