@@ -95,7 +95,7 @@ namespace DeExif {
 
             string origDir = Path.GetDirectoryName(origFile);
             string newFile = $"NEW{Path.GetFileName(origFile)}";
-            string newFullPath = Path.Combine(origDir, newFile);
+            string newFullPath = Path.Combine(origDir ?? throw new InvalidOperationException(), newFile);
             Console.WriteLine($"SOURCE: {opts.FileName}");
             Console.WriteLine($"TEMP  : {tempFile}");
             Console.WriteLine($"DEST  : {newFullPath}");
@@ -104,7 +104,7 @@ namespace DeExif {
                 File.Move(tempFile, newFullPath);
                 Console.WriteLine($"DONE.");
             } catch (Exception e) {
-                Console.WriteLine($"ERROR COPYING. Cleaned file: {tempFile}");
+                Console.WriteLine($"ERROR COPYING. Cleaned file: {tempFile}. Error: {e.Message}");
             }
 
 
