@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyTitle>JSON Validator</AssemblyTitle>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>validateJson</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>validateJson</PackageId>

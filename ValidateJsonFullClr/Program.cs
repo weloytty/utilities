@@ -38,17 +38,17 @@ namespace ValidateJson
 
             JSchema schema = JSchema.Parse(inputSchema);
 
-            IList<string> errorMessages;
-            bool validJson = input.IsValid(schema, out errorMessages);
+            bool validJson = input.IsValid(schema, out IList<string> errorMessages);
 
             Console.WriteLine("Json is {0}", (validJson ? "valid" : "not valid"));
-            if (!validJson)
+            if (validJson) {
+                return;
+            }
+
+            Console.WriteLine("Error messages:");
+            foreach (string s in errorMessages)
             {
-                Console.WriteLine("Error messages:");
-                foreach (string s in errorMessages)
-                {
-                    Console.WriteLine(s);
-                }
+                Console.WriteLine(s);
             }
         }
         private static void PrintUsage()
