@@ -10,6 +10,8 @@ namespace WEL.JsonValidator
         {
             int argCount = args.Count();
 
+            PrintBanner();
+
             if (argCount != 2)
             {
                 PrintUsage();
@@ -24,15 +26,25 @@ namespace WEL.JsonValidator
             if (!File.Exists(schemaFile)) { throw new FileNotFoundException($"Can't find '{schemaFile}'"); }
 
             var retVal = WEL.JsonUtils.IsValidJson(inputFile,schemaFile);
+            if (retVal.IsValid) {
+                Console.WriteLine("File validated successfully");
+            } else {
+                Console.WriteLine($"{retVal.ValidationResults.Count} errors validating {inputFile}");
+                foreach (var rr in retVal.ValidationResults) {
+                    Console.WriteLine(rr);
+                }
+            }
+        }
 
-
-
+        private static void PrintBanner() {
+            Console.WriteLine("");
+            Console.WriteLine("ValidateJson   : Validates a given Json file against a schema");
+            Console.WriteLine($"(c) 2016-{DateTime.Now.Year} Bill Loytty");
         }
 
         private static void PrintUsage()
         {
-            Console.WriteLine("");
-            Console.WriteLine("ValidateJson   : Validates a given Json file against a schema");
+            
             Console.WriteLine("          Usage: ValidateJson PathToInputFile PathToSchema");
             Console.WriteLine("PathToInputFile: Where the input is.");
             Console.WriteLine("PathToSchema   : Where the schema is.");
