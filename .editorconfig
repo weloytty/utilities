@@ -7,7 +7,21 @@
 indent_style=space
 
 # ReSharper properties
+resharper_anonymous_method_declaration_braces=end_of_line
+resharper_asp_remove_blank_lines_near_braces=true
+resharper_case_block_braces=end_of_line
+resharper_cpp_empty_block_style=together_same_line
+resharper_cpp_use_indent_from_vs=true
+resharper_csharp_empty_block_style=together_same_line
+resharper_csharp_keep_blank_lines_in_declarations=1
+resharper_html_use_indent_from_vs=true
 resharper_indent_nested_for_stmt=true
+resharper_indent_nested_usings_stmt=true
+resharper_int_align_switch_expressions=true
+resharper_invocable_declaration_braces=end_of_line
+resharper_normalize_tag_names=true
+resharper_other_braces=end_of_line
+resharper_vb_keep_blank_lines_in_code=1
 # Code files 
 [*.{cs,csx,vb,vbx}]
 indent_size=4

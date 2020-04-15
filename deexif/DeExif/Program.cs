@@ -28,10 +28,10 @@ namespace DeExif {
             if (File.Exists(opts.FileName)) {
                 try {
                     foreach (var s in GetProperties(opts.FileName)) {
-                        Console.WriteLine($"{s.Key.PadRight(25)}:{s.Value.PadLeft(55)}");
+                        Console.WriteLine($"{s.Key,25}:{s.Value,-55}");
                     }
                 } catch (Exception e) {
-                    Console.WriteLine($"Error procecssing {opts.FileName}:{e.Message}");
+                    Console.WriteLine($"Error processing {opts.FileName}:{e.Message}");
                 }
             }
 
@@ -40,36 +40,37 @@ namespace DeExif {
 
         private static IEnumerable<KeyValuePair<string, string>> GetProperties(string inputFile) {
 
-          
-                using (var reader = new ExifReader(inputFile)) {
-                    foreach (var tagId in Enum.GetValues(typeof(ExifTags)).Cast<ushort>()) {
-                        if (reader.GetTagValue(tagId, out object val)) {
-                            if (val is double) {
-                                if (reader.GetTagValue(tagId, out int[] rational)) {
-                                    val = $"{val} ({rational[0] / rational[1]})";
-                                }
-                            }
 
-                            yield return new KeyValuePair<string, string>($"{Enum.GetName(typeof(ExifTags), tagId)}",
-                                $"{RenderTag(val)}");
-                        }
-                    }
-
+            using var reader = new ExifReader(inputFile);
+            foreach (var tagId in Enum.GetValues(typeof(ExifTags)).Cast<ushort>()) {
+                if (!reader.GetTagValue(tagId, out object val)) {
+                    continue;
                 }
-          
+
+                if (val is double) {
+                    if (reader.GetTagValue(tagId, out int[] rational)) {
+                        val = $"{val} ({rational[0] / rational[1]})";
+                    }
+                }
+
+                yield return new KeyValuePair<string, string>($"{Enum.GetName(typeof(ExifTags), tagId)}",
+                    $"{RenderTag(val)}");
+            }
+
         }
 
         private static string RenderTag(object tagValue) {
             // Arrays don't render well without assistance.
-            if (tagValue is Array array) {
-                // Hex rendering for really big byte arrays (ugly otherwise)
-                if (array.Length > 20 && array.GetType().GetElementType() == typeof(byte))
-                    return "0x" + string.Join("", array.Cast<byte>().Select(x => x.ToString("X2")).ToArray());
-
-                return string.Join(", ", array.Cast<object>().Select(x => x.ToString()).ToArray());
+            if (!(tagValue is Array array)) {
+                return tagValue.ToString();
             }
 
-            return tagValue.ToString();
+            // Hex rendering for really big byte arrays (ugly otherwise)
+            if (array.Length > 20 && array.GetType().GetElementType() == typeof(byte))
+                return "0x" + string.Join("", array.Cast<byte>().Select(x => x.ToString("X2")).ToArray());
+
+            return string.Join(", ", array.Cast<object>().Select(x => x.ToString()).ToArray());
+
         }
 
         static int RunRemoveAndReturnExitCode(RemoveOptions opts) {
@@ -86,6 +87,8 @@ namespace DeExif {
                         ExifRemover.PatchAwayExif(inFs, outFs);
                     } catch (ExifLibException xifLibEx) {
                         Console.WriteLine($"Exception {xifLibEx.Message} trying to read '{opts.FileName}'");
+                    } catch (Exception e) {
+                        Console.WriteLine($"Exception {e.Message} trying to read '{opts.FileName}'");
                     } finally {
                         outFs.Close();
                     }
@@ -106,8 +109,6 @@ namespace DeExif {
             } catch (Exception e) {
                 Console.WriteLine($"ERROR COPYING. Cleaned file: {tempFile}. Error: {e.Message}");
             }
-
-
             return returnCode;
         }
     }

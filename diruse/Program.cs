@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Globalization;
+using System.Linq;
 using ConsoleUtilities;
 
 namespace diruse
@@ -10,17 +11,15 @@ namespace diruse
     class Program
     {
         //private static decimal biggestFile = 0;
-        enum outputFormat { Bytes, KiloBytes, MegaBytes, GigaBytes };
+        enum OutputFormat { Bytes, KiloBytes, MegaBytes, GigaBytes };
 
 
         static void Main(string[] args)
         {
-
-            double spaceUsed;
             var directoryToCheck = "";
             bool recursionFlag = false;
             bool verboseFlag = false;
-            outputFormat outFormat = outputFormat.Bytes;
+            OutputFormat outFormat = OutputFormat.Bytes;
 
 
 
@@ -29,7 +28,7 @@ namespace diruse
 
             if(args.Length > 4 || args.Length < 1)
             {
-                printUsage();
+                PrintUsage();
                 return;
             }
 
@@ -46,23 +45,21 @@ namespace diruse
                     verboseFlag = true;
 
                 if (args[i].ToUpper().ToString() == "-K")
-                    outFormat = outputFormat.KiloBytes;
+                    outFormat = OutputFormat.KiloBytes;
 
                 if (args[i].ToUpper().ToString() == "-B")
-                    outFormat = outputFormat.Bytes;
+                    outFormat = OutputFormat.Bytes;
 
                 if (args[i].ToUpper().ToString() == "-M")
-                    outFormat = outputFormat.MegaBytes;
+                    outFormat = OutputFormat.MegaBytes;
 
                 if (args[i].ToUpper().ToString() == "-G")
-                    outFormat = outputFormat.GigaBytes;
+                    outFormat = OutputFormat.GigaBytes;
 
             }
 
 
             if (args.Length > 1 && args[1] == "-R")recursionFlag = true;
-
-
 
             if (File.Exists(directoryToCheck))
             {
@@ -71,71 +68,43 @@ namespace diruse
                 FileInfo fi = new FileInfo(directoryToCheck);
                 Console.Write(fi.Length.ToString("N0", CultureInfo.InvariantCulture));
             }
-            else
-            {
-                spaceUsed = checkDirectory(directoryToCheck, recursionFlag, verboseFlag, true, outFormat);
-                if (verboseFlag)
-                {
-                    ConsoleUtils.WriteTwoColumns("Total:", GetFormattedNumber(spaceUsed,outFormat));
-                }
-                else
-                {
-                    ConsoleUtils.WriteTwoColumns("", GetFormattedNumber(spaceUsed, outFormat));
-                }
-
+            else {
+                var spaceUsed = CheckDirectory(directoryToCheck, recursionFlag, verboseFlag, true, outFormat);
+                ConsoleUtils.WriteTwoColumns(verboseFlag ? "Total:" : "", GetFormattedNumber(spaceUsed, outFormat));
             }
 
         }
 
-        private static string GetFormattedNumber(double input, outputFormat outFormat)
-        {
-            string returnString;
-
-            switch(outFormat)
-            {
-                case outputFormat.Bytes:
-                    returnString = input.ToString("N0",CultureInfo.InvariantCulture);
-                    break;
-                case outputFormat.KiloBytes:
-                    returnString = (input / 1024).ToString("N2",CultureInfo.InvariantCulture);
-                    break;
-                case outputFormat.MegaBytes:
-                    returnString = ((input /1024)/1024).ToString("N2",CultureInfo.InvariantCulture);
-                    break;
-                case outputFormat.GigaBytes:
-                    returnString = ((input / 1024) / 1024 / 1024).ToString("N2", CultureInfo.InvariantCulture);
-                    break;
-                default:
-                    returnString = input.ToString("N0", CultureInfo.InvariantCulture);
-                    break;
-            }
+        private static string GetFormattedNumber(double input, OutputFormat outFormat) {
+            var returnString = outFormat switch {
+                OutputFormat.Bytes => input.ToString("N0", CultureInfo.InvariantCulture),
+                OutputFormat.KiloBytes => (input / 1024).ToString("N2", CultureInfo.InvariantCulture),
+                OutputFormat.MegaBytes => ((input / 1024) / 1024).ToString("N2", CultureInfo.InvariantCulture),
+                OutputFormat.GigaBytes => ((input / 1024) / 1024 / 1024).ToString("N2", CultureInfo.InvariantCulture),
+                _ => input.ToString("N0", CultureInfo.InvariantCulture)
+            };
             return returnString;
-
         }
 
 
-        private static double checkDirectory(string directory, bool recurse, bool verbose, bool rootDirectory, outputFormat outFormat)
+        private static double CheckDirectory(string directory, bool recurse, bool verbose, bool rootDirectory, OutputFormat outFormat)
         {
 
             double directorySize = 0;
 
             if (Directory.Exists(directory))
             {
-
                 DirectoryInfo di = new DirectoryInfo(directory);
 
                 if (recurse)
                 {
-
                     DirectoryInfo[] subDirectories = di.GetDirectories();
                     try
                     {
-
                         foreach (DirectoryInfo subDirectory in subDirectories)
                         {
-                            directorySize += checkDirectory(directory + "\\" + subDirectory.ToString(), true, verbose,false, outFormat);
+                            directorySize += CheckDirectory(directory + "\\" + subDirectory.ToString(), true, verbose,false, outFormat);
                         }
-
                     }
                     catch (UnauthorizedAccessException)
                     {
@@ -144,10 +113,7 @@ namespace diruse
                     }
                 }
                 FileInfo[] files = di.GetFiles();
-                foreach (FileInfo file in files)
-                {
-                    directorySize += file.Length;
-                }
+                directorySize = files.Aggregate(directorySize, (current, file) => current + file.Length);
             }
             if (verbose) ConsoleUtils.WriteTwoColumns(directory, GetFormattedNumber(directorySize, outFormat));
             return directorySize;
@@ -155,7 +121,7 @@ namespace diruse
 
 
 
-        private static void printUsage()
+        private static void PrintUsage()
         {
             Console.WriteLine("\nUsage:  diruse [path] [-R] [-K|B|M]");
             Console.WriteLine("  [path]  = path to show");

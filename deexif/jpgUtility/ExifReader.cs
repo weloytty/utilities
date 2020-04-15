@@ -7,13 +7,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace JpgUtility {
- 
+
     /// <summary>
     /// A class for reading Exif data from a JPEG file. The file will be open for reading for as long as the class exists.
     /// <seealso cref="http://gvsoft.homedns.org/exif/Exif-explanation.html"/>
     /// </summary>
-    public sealed class ExifReader : IDisposable
-    {
+    public sealed class ExifReader : IDisposable {
         private readonly Stream _stream;
         private readonly BinaryReader _reader;
         /// <summary>
@@ -57,40 +56,36 @@ namespace JpgUtility {
 
         private static readonly Dictionary<ushort, IFD> _ifdLookup;
 
-        static ExifReader()
-        {
+        static ExifReader() {
             // Prepare the tag-IFD lookup table
             _ifdLookup = new Dictionary<ushort, IFD>();
 
-            var tagType = typeof (ExifTags);
-            
+            var tagType = typeof(ExifTags);
+
 #if !NETFX_CORE
             var tagFields = tagType.GetFields(BindingFlags.Static | BindingFlags.Public);
 #else
             var tagFields = System.Linq.Enumerable.Where(tagType.GetRuntimeFields(), x => (x.Attributes | FieldAttributes.Static) == FieldAttributes.Static);
 #endif
-            foreach (var tag in tagFields)
-            {
+            foreach (var tag in tagFields) {
 #if !NETFX_CORE
-                var ifdAttribute = (IFDAttribute) tag.GetCustomAttributes(typeof (IFDAttribute), false)[0];
+                var ifdAttribute = (IFDAttribute)tag.GetCustomAttributes(typeof(IFDAttribute), false)[0];
 #else
                 var ifdAttribute = (IFDAttribute)tag.GetCustomAttribute(typeof(IFDAttribute), false);
 #endif
-                _ifdLookup[(ushort) tag.GetValue(null)] = ifdAttribute.IFD;
+                _ifdLookup[(ushort)tag.GetValue(null)] = ifdAttribute.IFD;
             }
         }
 
         // Windows 8 store apps don't support the FileStream class
 #if !NETFX_CORE
         public ExifReader(string fileName)
-            : this(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), false, true)
-        {
+            : this(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), false, true) {
         }
 #endif
 
         public ExifReader(Stream stream)
-            : this(stream, false, false)
-        {
+            : this(stream, false, false) {
         }
 
         // Framework 4.5 gives us the option of leaving the stream open (with the new constructor for BinaryReader). For this framework, we make a new constructor available
@@ -106,14 +101,12 @@ namespace JpgUtility {
         /// <param name="stream"></param>
         /// <param name="leaveOpen">Indicates whether <see cref="stream"/> should be closed when <see cref="Dispose"/> is called</param>
         /// <param name="internalStream">Indicates whether <see cref="stream"/> was instantiated by this reader</param>
-        private ExifReader(Stream stream, bool leaveOpen, bool internalStream)
-        {
+        private ExifReader(Stream stream, bool leaveOpen, bool internalStream) {
             _stream = stream;
             _leaveOpen = leaveOpen;
             long initialPosition = 0;
 
-            try
-            {
+            try {
                 if (stream == null)
                     throw new ArgumentNullException("stream");
 
@@ -139,32 +132,22 @@ namespace JpgUtility {
                     throw new ExifLibException("File is not a valid JPEG");
 
                 // Scan to the start of the Exif content
-                try
-                {
+                try {
                     ReadToExifStart();
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     throw new ExifLibException("Unable to locate EXIF content", ex);
                 }
 
                 // Create an index of all Exif tags found within the document
-                try
-                {
+                try {
                     CreateTagIndex();
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     throw new ExifLibException("Error indexing EXIF tags", ex);
                 }
-            }
-            catch
-            {
+            } catch {
                 // Cleanup. Note that the stream is not closed unless it was created internally
-                try
-                {
-                    if (_reader != null)
-                    {
+                try {
+                    if (_reader != null) {
 #if NETFX_CORE
                         _reader.Dispose();
 #else
@@ -172,19 +155,15 @@ namespace JpgUtility {
 #endif
                     }
 
-                    if (_stream != null)
-                    {
+                    if (_stream != null) {
                         if (internalStream)
                             _stream.Dispose();
-                        else if (_stream.CanSeek)
-                        {
+                        else if (_stream.CanSeek) {
                             // Try to restore the stream to its initial position
                             _stream.Position = initialPosition;
                         }
                     }
-                }
-                catch
-                {
+                } catch {
                 }
 
                 throw;
@@ -197,10 +176,8 @@ namespace JpgUtility {
         /// Returns the length (in bytes) per component of the specified TIFF data type
         /// </summary>
         /// <returns></returns>
-        private byte GetTIFFFieldLength(ushort tiffDataType)
-        {
-            switch (tiffDataType)
-            {
+        private byte GetTIFFFieldLength(ushort tiffDataType) {
+            switch (tiffDataType) {
                 case 0:
                     // Unknown datatype, therefore it can't be interpreted reliably
                     return 0;
@@ -233,8 +210,7 @@ namespace JpgUtility {
         /// Gets a 2 byte unsigned integer from the file
         /// </summary>
         /// <returns></returns>
-        private ushort ReadUShort()
-        {
+        private ushort ReadUShort() {
             return ToUShort(ReadBytes(2));
         }
 
@@ -242,19 +218,16 @@ namespace JpgUtility {
         /// Gets a 4 byte unsigned integer from the file
         /// </summary>
         /// <returns></returns>
-        private uint ReadUint()
-        {
+        private uint ReadUint() {
             return ToUint(ReadBytes(4));
         }
 
-        private string ReadString(int chars)
-        {
+        private string ReadString(int chars) {
             var bytes = ReadBytes(chars);
             return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
         }
 
-        private byte[] ReadBytes(int byteCount)
-        {
+        private byte[] ReadBytes(int byteCount) {
             var bytes = _reader.ReadBytes(byteCount);
 
             // ReadBytes may return less than the bytes requested if the end of the stream is reached
@@ -270,8 +243,7 @@ namespace JpgUtility {
         /// <param name="tiffOffset"></param>
         /// <param name="byteCount"></param>
         /// <returns></returns>
-        private byte[] ReadBytes(ushort tiffOffset, int byteCount)
-        {
+        private byte[] ReadBytes(ushort tiffOffset, int byteCount) {
             // Keep the current file offset
             long originalOffset = _stream.Position;
 
@@ -294,8 +266,7 @@ namespace JpgUtility {
         /// Converts 2 bytes to a ushort using the current byte aligns
         /// </summary>
         /// <returns></returns>
-        private ushort ToUShort(byte[] data)
-        {
+        private ushort ToUShort(byte[] data) {
             if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
@@ -306,8 +277,7 @@ namespace JpgUtility {
         /// Converts 8 bytes to the numerator and denominator
         /// components of an unsigned rational using the current byte aligns
         /// </summary>
-        private uint[] ToURationalFraction(byte[] data)
-        {
+        private uint[] ToURationalFraction(byte[] data) {
             var numeratorData = new byte[4];
             var denominatorData = new byte[4];
 
@@ -325,8 +295,7 @@ namespace JpgUtility {
         /// Converts 8 bytes to an unsigned rational using the current byte aligns
         /// </summary>
         /// <seealso cref="ToRational"/>
-        private double ToURational(byte[] data)
-        {
+        private double ToURational(byte[] data) {
             var fraction = ToURationalFraction(data);
 
             return fraction[0] / (double)fraction[1];
@@ -340,8 +309,7 @@ namespace JpgUtility {
         /// A TIFF rational contains 2 4-byte integers, the first of which is
         /// the numerator, and the second of which is the denominator.
         /// </remarks>
-        private int[] ToRationalFraction(byte[] data)
-        {
+        private int[] ToRationalFraction(byte[] data) {
             var numeratorData = new byte[4];
             var denominatorData = new byte[4];
 
@@ -358,8 +326,7 @@ namespace JpgUtility {
         /// Converts 8 bytes to a signed rational using the current byte aligns.
         /// </summary>
         /// <seealso cref="ToRationalFraction"/>
-        private double ToRational(byte[] data)
-        {
+        private double ToRational(byte[] data) {
             var fraction = ToRationalFraction(data);
 
             return fraction[0] / (double)fraction[1];
@@ -368,8 +335,7 @@ namespace JpgUtility {
         /// <summary>
         /// Converts 4 bytes to a uint using the current byte aligns
         /// </summary>
-        private uint ToUint(byte[] data)
-        {
+        private uint ToUint(byte[] data) {
             if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
@@ -379,40 +345,35 @@ namespace JpgUtility {
         /// <summary>
         /// Converts 4 bytes to an int using the current byte aligns
         /// </summary>
-        private int ToInt(byte[] data)
-        {
+        private int ToInt(byte[] data) {
             if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToInt32(data, 0);
         }
 
-        private double ToDouble(byte[] data)
-        {
+        private double ToDouble(byte[] data) {
             if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToDouble(data, 0);
         }
 
-        private float ToSingle(byte[] data)
-        {
+        private float ToSingle(byte[] data) {
             if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToSingle(data, 0);
         }
 
-        private short ToShort(byte[] data)
-        {
+        private short ToShort(byte[] data) {
             if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToInt16(data, 0);
         }
 
-        private sbyte ToSByte(byte[] data)
-        {
+        private sbyte ToSByte(byte[] data) {
             // An sbyte should just be a byte with an offset range.
             return (sbyte)(data[0] - byte.MaxValue);
         }
@@ -425,15 +386,13 @@ namespace JpgUtility {
         /// <param name="elementLengthBytes"></param>
         /// <param name="converter"></param>
         /// <returns></returns>
-        private static Array GetArray<T>(byte[] data, int elementLengthBytes, ConverterMethod<T> converter)
-        {
+        private static Array GetArray<T>(byte[] data, int elementLengthBytes, ConverterMethod<T> converter) {
             Array convertedData = new T[data.Length / elementLengthBytes];
 
             var buffer = new byte[elementLengthBytes];
 
             // Read each element from the array
-            for (int elementCount = 0; elementCount < data.Length / elementLengthBytes; elementCount++)
-            {
+            for (int elementCount = 0; elementCount < data.Length / elementLengthBytes; elementCount++) {
                 // Place the data for the current element into the buffer
                 Array.Copy(data, elementCount * elementLengthBytes, buffer, 0, elementLengthBytes);
 
@@ -459,8 +418,7 @@ namespace JpgUtility {
         /// <summary>
         /// Scans to the Exif block
         /// </summary>
-        private void ReadToExifStart()
-        {
+        private void ReadToExifStart() {
             // The file has a number of blocks (Exif/JFIF), each of which
             // has a tag number followed by a length. We scan the document until the required tag (0xFFE1)
             // is found. All tags start with FF, so a non FF tag indicates an error.
@@ -468,8 +426,7 @@ namespace JpgUtility {
             // Get the next tag.
             byte markerStart;
             byte markerNumber = 0;
-            while (((markerStart = _reader.ReadByte()) == 0xFF) && (markerNumber = _reader.ReadByte()) != 0xE1)
-            {
+            while (((markerStart = _reader.ReadByte()) == 0xFF) && (markerNumber = _reader.ReadByte()) != 0xE1) {
                 // Get the length of the data.
                 ushort dataLength = ReadUShort();
 
@@ -495,8 +452,7 @@ namespace JpgUtility {
         /// Reads through the Exif data and builds an index of all Exif tags in the document
         /// </summary>
         /// <returns></returns>
-        private void CreateTagIndex()
-        {
+        private void CreateTagIndex() {
             // The next 4 bytes are the size of the Exif data.
             ReadUShort();
 
@@ -532,8 +488,7 @@ namespace JpgUtility {
 
             // There's more data stored in the EXIF subifd, the offset to which is found in tag 0x8769.
             // As with all TIFF offsets, it will be relative to the first byte of the TIFF header.
-            if (GetTagValue(_ifd0PrimaryCatalogue, 0x8769, out uint offset))
-            {
+            if (GetTagValue(_ifd0PrimaryCatalogue, 0x8769, out uint offset)) {
                 // Jump to the exif SubIFD
                 _stream.Position = offset + _tiffHeaderStart;
 
@@ -542,8 +497,7 @@ namespace JpgUtility {
             }
 
             // Go to the GPS IFD and catalogue that too. It's an optional section.
-            if (GetTagValue(_ifd0PrimaryCatalogue, 0x8825, out offset))
-            {
+            if (GetTagValue(_ifd0PrimaryCatalogue, 0x8825, out offset)) {
                 // Jump to the GPS SubIFD
                 _stream.Position = offset + _tiffHeaderStart;
 
@@ -552,8 +506,7 @@ namespace JpgUtility {
             }
 
             // Finally, catalogue the thumbnail IFD if it's present
-            if (ifd1Offset != 0)
-            {
+            if (ifd1Offset != 0) {
                 _stream.Position = ifd1Offset + _tiffHeaderStart;
                 _ifd1Catalogue = CatalogueIFD();
             }
@@ -562,13 +515,11 @@ namespace JpgUtility {
 
         #region Exif data catalog and retrieval methods
 
-        public bool GetTagValue<T>(ExifTags tag, out T result)
-        {
+        public bool GetTagValue<T>(ExifTags tag, out T result) {
             return GetTagValue((ushort)tag, out result);
         }
 
-        public bool GetTagValue<T>(ushort tagID, out T result)
-        {
+        public bool GetTagValue<T>(ushort tagID, out T result) {
             if (_ifdLookup.TryGetValue(tagID, out var ifd))
                 return GetTagValue(tagID, ifd, out result);
 
@@ -584,12 +535,10 @@ namespace JpgUtility {
         ///  Retrieves a numbered tag from a specific IFD
         /// </summary>
         /// <remarks>Useful for cases where a new or non-standard tag isn't present in the <see cref="ExifTags"/> enumeration</remarks>
-        public bool GetTagValue<T>(ushort tagID, IFD ifd, out T result)
-        {
+        public bool GetTagValue<T>(ushort tagID, IFD ifd, out T result) {
             Dictionary<ushort, long> catalogue;
 
-            switch (ifd)
-            {
+            switch (ifd) {
                 case IFD.IFD0:
                     catalogue = _ifd0PrimaryCatalogue;
                     break;
@@ -609,20 +558,17 @@ namespace JpgUtility {
         /// <summary>
         /// Retrieves an Exif value with the requested tag ID
         /// </summary>
-        private bool GetTagValue<T>(Dictionary<ushort, long> tagDictionary, ushort tagID, out T result)
-        {
+        private bool GetTagValue<T>(Dictionary<ushort, long> tagDictionary, ushort tagID, out T result) {
             byte[] tagData = GetTagBytes(tagDictionary, tagID, out var tiffDataType, out var numberOfComponents);
 
-            if (tagData == null)
-            {
+            if (tagData == null) {
                 result = default;
                 return false;
             }
 
             byte fieldLength = GetTIFFFieldLength(tiffDataType);
 
-            if (fieldLength == 0)
-            {
+            if (fieldLength == 0) {
                 // Some fields have no data at all. Treat them as though they're absent, as they're bogus
                 result = default;
                 return false;
@@ -630,23 +576,19 @@ namespace JpgUtility {
 
             // Convert the data to the appropriate datatype. Note the weird boxing via object.
             // The compiler doesn't like it otherwise.
-            switch (tiffDataType)
-            {
+            switch (tiffDataType) {
                 case 1:
                     // unsigned byte
                     if (numberOfComponents == 1)
-                        result = (T) (object) tagData[0];
-                    else
-                    {
+                        result = (T)(object)tagData[0];
+                    else {
                         // If a string is requested from a byte array, it will be unicode encoded.
-                        if (typeof (T) == typeof (string))
-                        {
+                        if (typeof(T) == typeof(string)) {
                             var decoded = Encoding.Unicode.GetString(tagData, 0, tagData.Length);
                             // Unicode strings are null-terminated
                             result = (T)(object)decoded.TrimEnd('\0');
-                        }
-                        else
-                            result = (T) (object) tagData;
+                        } else
+                            result = (T)(object)tagData;
                     }
                     return true;
                 case 2:
@@ -659,8 +601,7 @@ namespace JpgUtility {
                         str = str.Substring(0, nullCharIndex);
 
                     // Special processing for dates.
-                    if (typeof(T) == typeof(DateTime))
-                    {
+                    if (typeof(T) == typeof(DateTime)) {
                         bool success = ToDateTime(str, out var dateResult);
 
                         result = (T)(object)dateResult;
@@ -686,16 +627,14 @@ namespace JpgUtility {
                     return true;
                 case 5:
                     // unsigned rational
-                    if (numberOfComponents == 1)
-                    {
+                    if (numberOfComponents == 1) {
                         // Special case - sometimes it's useful to retrieve the numerator and
                         // denominator in their raw format
                         if (typeof(T).IsArray)
                             result = (T)(object)ToURationalFraction(tagData);
                         else
                             result = (T)(object)ToURational(tagData);
-                    }
-                    else
+                    } else
                         result = (T)(object)GetArray(tagData, fieldLength, ToURational);
                     return true;
                 case 6:
@@ -728,16 +667,14 @@ namespace JpgUtility {
                     return true;
                 case 10:
                     // signed rational
-                    if (numberOfComponents == 1)
-                    {
+                    if (numberOfComponents == 1) {
                         // Special case - sometimes it's useful to retrieve the numerator and
                         // denominator in their raw format
                         if (typeof(T).IsArray)
                             result = (T)(object)ToRationalFraction(tagData);
                         else
                             result = (T)(object)ToRational(tagData);
-                    }
-                    else
+                    } else
                         result = (T)(object)GetArray(tagData, fieldLength, ToRational);
                     return true;
                 case 11:
@@ -759,21 +696,18 @@ namespace JpgUtility {
             }
         }
 
-        private static bool ToDateTime(string str, out DateTime result)
-        {
+        private static bool ToDateTime(string str, out DateTime result) {
             // From page 28 of the Exif 2.2 spec (http://www.exif.org/Exif2-2.PDF): 
 
             // "When the field is left blank, it is treated as unknown ... When the date and time are unknown, 
             // all the character spaces except colons (":") may be filled with blank characters"
-            if (string.IsNullOrEmpty(str) || _nullDateTimeMatcher.IsMatch(str))
-            {
+            if (string.IsNullOrEmpty(str) || _nullDateTimeMatcher.IsMatch(str)) {
                 result = DateTime.MinValue;
                 return false;
             }
 
             // There are 2 types of date - full date/time stamps, and plain dates. Dates are 10 characters long.
-            if (str.Length == 10)
-            {
+            if (str.Length == 10) {
                 result = DateTime.ParseExact(str, "yyyy:MM:dd", CultureInfo.InvariantCulture);
                 return true;
             }
@@ -791,11 +725,9 @@ namespace JpgUtility {
         /// number of characters in the string</param>
         /// <param name="tagDictionary"></param>
         /// <param name="tagID"></param>
-        private byte[] GetTagBytes(Dictionary<ushort, long> tagDictionary, ushort tagID, out ushort tiffDataType, out uint numberOfComponents)
-        {
+        private byte[] GetTagBytes(Dictionary<ushort, long> tagDictionary, ushort tagID, out ushort tiffDataType, out uint numberOfComponents) {
             // Get the tag's offset from the catalogue and do some basic error checks
-            if (_stream == null || _reader == null || tagDictionary == null || !tagDictionary.ContainsKey(tagID))
-            {
+            if (_stream == null || _reader == null || tagDictionary == null || !tagDictionary.ContainsKey(tagID)) {
                 tiffDataType = 0;
                 numberOfComponents = 0;
                 return null;
@@ -822,8 +754,7 @@ namespace JpgUtility {
             // to the actual data.
             var dataSize = (int)(numberOfComponents * GetTIFFFieldLength(tiffDataType));
 
-            if (dataSize > 4)
-            {
+            if (dataSize > 4) {
                 ushort offsetAddress = ToUShort(tagData);
                 return ReadBytes(offsetAddress, dataSize);
             }
@@ -837,8 +768,7 @@ namespace JpgUtility {
         /// <summary>
         /// Reads the current IFD header and records all Exif tags and their offsets in a <see cref="Dictionary{TKey,TValue}"/>
         /// </summary>
-        private Dictionary<ushort, long> CatalogueIFD()
-        {
+        private Dictionary<ushort, long> CatalogueIFD() {
             Dictionary<ushort, long> tagOffsets = new Dictionary<ushort, long>();
 
             // Assume we're just before the IFD.
@@ -846,8 +776,7 @@ namespace JpgUtility {
             // First 2 bytes is the number of entries in this IFD
             ushort entryCount = ReadUShort();
 
-            for (ushort currentEntry = 0; currentEntry < entryCount; currentEntry++)
-            {
+            for (ushort currentEntry = 0; currentEntry < entryCount; currentEntry++) {
                 ushort currentTagNumber = ReadUShort();
 
                 // Record this in the catalogue
@@ -870,8 +799,7 @@ namespace JpgUtility {
         /// details on the encoding of TIFF thumbnails
         /// </summary>
         /// <returns></returns>
-        public byte[] GetJpegThumbnailBytes()
-        {
+        public byte[] GetJpegThumbnailBytes() {
             if (_ifd1Catalogue == null)
                 return null;
 
@@ -896,8 +824,7 @@ namespace JpgUtility {
             // The thumbnail may be padded, so we scan forward until we reach the JPEG header (0xFFD8) or the end of the file
             int currentByte;
             int previousByte = -1;
-            while ((currentByte = _stream.ReadByte()) != -1)
-            {
+            while ((currentByte = _stream.ReadByte()) != -1) {
                 if (previousByte == 0xFF && currentByte == 0xD8)
                     break;
 
@@ -916,8 +843,7 @@ namespace JpgUtility {
 
             // A valid JPEG stream ends with 0xFFD9. The stream may be padded at the end with multiple 0xFF or 0x00 bytes.
             int jpegStreamEnd = (int)length - 1;
-            for (; jpegStreamEnd > 0; jpegStreamEnd--)
-            {
+            for (; jpegStreamEnd > 0; jpegStreamEnd--) {
                 var lastByte = imageBytes[jpegStreamEnd];
                 if (lastByte != 0xFF && lastByte != 0x00)
                     break;
@@ -932,11 +858,9 @@ namespace JpgUtility {
 
         #region IDisposable Members
 
-        public void Dispose()
-        {
+        public void Dispose() {
             // Make sure the stream is released if appropriate. Note the different options for Windows Store apps.
-            if (_reader != null)
-            {
+            if (_reader != null) {
 #if NETFX_CORE
                 _reader.Dispose();
 #else
@@ -951,20 +875,16 @@ namespace JpgUtility {
         #endregion
     }
 
-    public class ExifLibException : Exception
-    {
-        public ExifLibException()
-        {
+    public class ExifLibException : Exception {
+        public ExifLibException() {
         }
 
         public ExifLibException(string message)
-            : base(message)
-        {
+            : base(message) {
         }
 
         public ExifLibException(string message, Exception innerException)
-            : base(message, innerException)
-        {
+            : base(message, innerException) {
         }
     }
 

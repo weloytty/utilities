@@ -65,60 +65,36 @@ namespace IsDebug
                 }
 
 
-                if (!IsDotNet(fileName, beVerbose))
-                {
-                    using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                if (!IsDotNet(fileName, beVerbose)) {
+                    using FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                    using BinaryReader br = new BinaryReader(fs);
+
+                    fs.Seek(0x3c, SeekOrigin.Begin);
+                    Int32 peOffset = br.ReadInt32();
+                    fs.Seek(peOffset, SeekOrigin.Begin);
+                    UInt32 peHead = br.ReadUInt32();
+                    bool hasPEHeader = (peHead == 0x00004550);
+                    Console.WriteLine($"Has PE Header : {hasPEHeader}");
+
+                    if (hasPEHeader)
                     {
-                        using (BinaryReader br = new BinaryReader(fs))
+                        MachineType mt = (MachineType)(br.ReadUInt16());
+                        string machineType = mt switch
                         {
-                            fs.Seek(0x3c, SeekOrigin.Begin);
-                            Int32 peOffset = br.ReadInt32();
-                            fs.Seek(peOffset, SeekOrigin.Begin);
-                            UInt32 peHead = br.ReadUInt32();
-                            bool hasPEHeader = (peHead == 0x00004550);
-                            Console.WriteLine($"Has PE Header : {hasPEHeader}");
-
-                            if (hasPEHeader)
-                            {
-                                MachineType mt = (MachineType)(br.ReadUInt16());
-                                string machineType = "Unknown";
-
-                                switch (mt)
-                                {
-                                    case MachineType.IMAGE_FILE_MACHINE_AMD64:
-                                        machineType = "AMD64";
-                                        break;
-                                    case MachineType.IMAGE_FILE_MACHINE_I386:
-                                        machineType = "i386";
-                                        break;
-                                    case MachineType.IMAGE_FILE_MACHINE_IA64:
-                                        machineType = "IA64";
-                                        break;
-
-                                    default:
-                                        machineType = mt.ToString();
-                                        break;
-                                }
-                                Console.WriteLine($"Machine Type  : {machineType}");
-
-
-
-
-                            }
-                        }
+                            MachineType.IMAGE_FILE_MACHINE_AMD64 => "AMD64",
+                            MachineType.IMAGE_FILE_MACHINE_I386  => "i386",
+                            MachineType.IMAGE_FILE_MACHINE_IA64  => "IA64",
+                            _                                    => mt.ToString(),
+                        };
+                        Console.WriteLine($"Machine Type  : {machineType}");
                     }
                 }
                 else
                 {
                     if (beVerbose)
                     {
-
-
                         var assembly = Assembly.ReflectionOnlyLoadFrom(fileName);
                         Console.WriteLine($"CLR Version   : {assembly.ImageRuntimeVersion}");
-
-
-
                     }
 
                     var ass = Assembly.LoadFile(fileName);
@@ -126,7 +102,6 @@ namespace IsDebug
                         if (att.GetType() == Type.GetType("System.Diagnostics.DebuggableAttribute"))
                         {
                             var typedAttribute = (DebuggableAttribute)att;
-
 
                             var debugOuput =
                                 (typedAttribute.DebuggingFlags & DebuggableAttribute.DebuggingModes.Default)
@@ -191,16 +166,14 @@ namespace IsDebug
             {
 
                 bif = null;//make the compiler happy
-                //if (doSpew)
-                //    Console.WriteLine(
-                //        $"BadImageFormatException, {fileName} has the wrong format or is not a .net assembly.");
+                if (doSpew) Console.WriteLine($"BadImageFormatException, {fileName} has the wrong format or is not a .net assembly.");
 
                 //It's not a .net assembly, or wrong format, so we'll just return false
 
             }
             catch (Exception e)
             {
-                if (doSpew) Console.WriteLine($"Error loading {Path.GetFileName(fileName)}:{e.Message}" );
+                if (doSpew) Console.WriteLine($"Error loading {Path.GetFileName(fileName)}:{e.Message}");
             }
 
             if (doSpew)

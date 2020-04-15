@@ -20,11 +20,9 @@ namespace QSend {
         private static int RunQSendAndReturnExitCode(QSendOptions opts) {
 
             using (MessageQueue mq = new MessageQueue(opts.DestinationQueue)) {
-                using (Message msg = new Message(opts.MessageBody, new XmlMessageFormatter())) {
-
-                    msg.Body = opts.MessageBody;
-                    mq.Send(msg, opts.MessageLabel);
-                }
+                using Message msg = new Message(opts.MessageBody, new XmlMessageFormatter());
+                msg.Body = opts.MessageBody;
+                mq.Send(msg, opts.MessageLabel);
             }
             return 0;
         }

@@ -22,7 +22,7 @@ namespace freedisk
                         {
                             ++index;
                             string cleanName = Program.RemoveInvalidChars(args[index]);
-                            wmiQuery = wmiQuery + $" WHERE Name = '{cleanName}'";
+                            wmiQuery += $" WHERE Name = '{cleanName}'";
                         }
                         break;
                     case "-b":
@@ -43,19 +43,19 @@ namespace freedisk
             try {
                 
                 PrintBanner();
-                ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(new ManagementScope("\\\\" + computerName + "\\root\\cimv2"), new SelectQuery(wmiQuery));
+                var managementObjectSearcher = new ManagementObjectSearcher(new ManagementScope("\\\\" + computerName + "\\root\\cimv2"), new SelectQuery(wmiQuery));
                 Console.WriteLine("");
                 if (noOutput)
                 {
                     Console.WriteLine("Name Size (GB)   Free (GB)");
                     Console.WriteLine("---- ---------   --------");
                 }
-                foreach (ManagementObject managementObject in managementObjectSearcher.Get())
+                foreach (var mo in managementObjectSearcher.Get())
                 {
-                    ulong diskSize = Convert.ToUInt64(managementObject.GetPropertyValue("Size"));
-                    ulong diskFree = Convert.ToUInt64(managementObject.GetPropertyValue("FreeSpace"));
+                    ulong diskSize = Convert.ToUInt64(mo.GetPropertyValue("Size"));
+                    ulong diskFree = Convert.ToUInt64(mo.GetPropertyValue("FreeSpace"));
                     if (diskSize > 0UL)
-                        Console.WriteLine("{0}   {1}    {2}", managementObject.GetPropertyValue("Name"), 
+                        Console.WriteLine("{0}   {1}    {2}", mo.GetPropertyValue("Name"), 
                             Program.BytesToFormattedGB(diskSize, 8), 
                             Program.BytesToFormattedGB(diskFree, 8));
                 }
