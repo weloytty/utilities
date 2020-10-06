@@ -9,7 +9,9 @@ using System.IO;
 namespace timeit {
     class Program {
         static void Main(string[] args) {
-
+/*
+I am messing around with gitversion
+*/
             var fileName = args[0];
             if (!File.Exists(fileName)) {
                 Console.WriteLine($"Can't find {fileName}");
