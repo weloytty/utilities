@@ -36,6 +36,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "isomounted", "isomounted\is
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "timeit", "timeit\timeit.csproj", "{9AE37935-FA00-4CF6-BEBD-A5B5D014DBB0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "asyncmsmqtest", "asyncmsmqtest\asyncmsmqtest.csproj", "{D4000285-D981-4ADA-88F1-28D2818CD2F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -188,6 +190,18 @@ Global
 		{9AE37935-FA00-4CF6-BEBD-A5B5D014DBB0}.Release|x64.Build.0 = Release|Any CPU
 		{9AE37935-FA00-4CF6-BEBD-A5B5D014DBB0}.Release|x86.ActiveCfg = Release|Any CPU
 		{9AE37935-FA00-4CF6-BEBD-A5B5D014DBB0}.Release|x86.Build.0 = Release|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Debug|x64.Build.0 = Debug|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Debug|x86.Build.0 = Debug|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Release|x64.ActiveCfg = Release|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Release|x64.Build.0 = Release|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Release|x86.ActiveCfg = Release|Any CPU
+		{D4000285-D981-4ADA-88F1-28D2818CD2F2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
