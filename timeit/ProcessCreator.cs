@@ -42,6 +42,19 @@ public class ProcessCreator {
         public static  uint INFINITE = 0xFFFFFFFF;// Infinite timeout
 
         public static bool CreateProcess(int parentProcessId,string fullPath) {
+
+
+/*
+The only reason I wrote this is because we were having a problem with a machine that
+took FOREVER to start an app, and we wanted to quantify how long it took so we could
+tell our IT department to fix their shit.
+
+
+This function is basically setting up and starting an app, and then waiting for it to finish
+loading (i.e. WaitForInputIdle)
+*/
+
+
             const uint EXTENDED_STARTUPINFO_PRESENT = 0x00080000;
             const int PROC_THREAD_ATTRIBUTE_PARENT_PROCESS = 0x00020000;
 
