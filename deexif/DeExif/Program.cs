@@ -61,7 +61,7 @@ namespace DeExif {
 
         private static string RenderTag(object tagValue) {
             // Arrays don't render well without assistance.
-            if (!(tagValue is Array array)) {
+            if (tagValue is not Array array) {
                 return tagValue.ToString();
             }
 
@@ -74,6 +74,7 @@ namespace DeExif {
         }
 
         static int RunRemoveAndReturnExitCode(RemoveOptions opts) {
+
             int returnCode = 0;
 
             if (!File.Exists(opts.FileName)) {

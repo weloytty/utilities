@@ -108,7 +108,7 @@ namespace JpgUtility {
 
             try {
                 if (stream == null)
-                    throw new ArgumentNullException("stream");
+                    throw new ArgumentNullException(nameof(stream));
 
                 if (!stream.CanSeek)
                     throw new ExifLibException("ExifLib requires a seekable stream");

@@ -168,9 +168,7 @@ namespace IsDebug {
             try {
                 Assembly.LoadFile(fileName);
                 returnValue = true;
-            } catch (BadImageFormatException bif) {
-
-                bif = null;//make the compiler happy
+            } catch (BadImageFormatException) {
                 if (doSpew) Console.WriteLine($"BadImageFormatException, {fileName} has the wrong format or is not a .net assembly.");
 
                 //It's not a .net assembly, or wrong format, so we'll just return false
