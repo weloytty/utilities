@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
-using System.Messaging;
 using System.Reflection;
+using MSMQ.Messaging;
 
 namespace QSend {
     class Program {
@@ -19,7 +19,7 @@ namespace QSend {
 
         private static int RunQSendAndReturnExitCode(QSendOptions opts) {
 
-            using (MessageQueue mq = new MessageQueue(opts.DestinationQueue)) {
+            using (MSMQ.Messaging.MessageQueue mq = new MessageQueue(opts.DestinationQueue)) {
                 using Message msg = new Message(opts.MessageBody, new XmlMessageFormatter());
                 msg.Body = opts.MessageBody;
                 mq.Send(msg, opts.MessageLabel);
